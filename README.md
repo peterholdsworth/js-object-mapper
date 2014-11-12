@@ -1,2 +1,2 @@
-js_object_mapper
+js-object-mapper
 ================
