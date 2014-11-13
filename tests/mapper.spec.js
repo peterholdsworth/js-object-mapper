@@ -3,7 +3,8 @@
 var should = require('should');
 var util = require('util');
 var Mapper = require('../src/mapper');
-var m, n, o, i;
+var m, o, i;
+
 
 describe("Mapper", function() {
 
@@ -25,6 +26,11 @@ describe("Mapper", function() {
     });
     o = m.execute({a: 1});
     o.should.eql({b: 1});
+  });
+
+  it('should use whole value when source is an empty array', function(){
+    o = m.submap('a', 'b', {}, new Mapper().move('number', '')).execute({b:[{a:1},{a:2}]});
+    o.should.eql({ a: [ { number: { a: 1 } }, { number: { a: 2 } } ] });
   });
 
   it("should conditionally not move field a to field b", function() {
@@ -62,9 +68,9 @@ describe("Mapper", function() {
     m.move('b', 'a');
     o = m.execute({a: 1});
     o.should.eql({b: 1});
-    n = new Mapper()
+    var m2 = new Mapper()
       .move('b', 'a');
-    o = n.execute({a: 1});
+    o = m2.execute({a: 1});
     o.should.eql({b: 1});
   });
 
@@ -167,7 +173,7 @@ describe("Mapper", function() {
     var diff = process.hrtime(before); // [seconds, nanoseconds]
     o.should.eql({b: 1, d: 2});
     diff[0].should.eql(0);
-    diff[1].should.be.below(100 * 1000 * 1000);
+    diff[1].should.be.below(140 * 1000 * 1000);
   });
 
   it("should move field a to multiple field b", function() {
@@ -384,6 +390,7 @@ describe("Mapper", function() {
   });
 
   it("should support JSONPath", function() {
+                  //root operator and recursive descent
     m.move('c', '$..c', {multiple: true});
     o = m.execute({a: {b: {c: 1}, c: 2}});
     o.should.eql({c: [2, 1]});
@@ -417,8 +424,7 @@ describe("Mapper", function() {
   });
 
   it("should give access to parameters for unit testing", function() {
-    m
-      .move('a', 'b', {
+    m.move('a', 'b', {
         condition: function() {
           return false;
         }

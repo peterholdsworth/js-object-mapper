@@ -22,7 +22,7 @@
   ],
   "engine": "node >= 0.10.12",
   "scripts": {
-    "test": "NODE_ENV=test node test.js"
+    "test": "mocha tests && istanbul cover node_modules/mocha/bin/_mocha --dir ./.coverage -- --recursive ./tests/**/*.js --reporter spec"
   },
   "main": "./lib/mapper",
   "publishConfig": {
@@ -42,6 +42,7 @@
   "devDependencies": {
     "istanbul": "^0.2.7",
     "mocha": "~1.18.0",
+    "precommit-hook": "`1.0.7",
     "should": "^4.3.0"
   },
   "readmeFilename": "README.md",
@@ -64,5 +65,8 @@
     }
   ],
   "_shasum": "9c41a23e5a56981ffe09ba4090bd2f8c47d9d89e",
-  "_resolved": "http://npm.eceit.net/tc-js-object-mapper/-/tc-js-object-mapper-1.0.0-0002-cbcf2ca0.tgz"
+  "_resolved": "http://npm.eceit.net/tc-js-object-mapper/-/tc-js-object-mapper-1.0.0-0002-cbcf2ca0.tgz",
+  "precommit": [
+    "test"
+  ]
 }

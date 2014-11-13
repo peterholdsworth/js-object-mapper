@@ -3,6 +3,9 @@
 
 Use this library to construct a Mapper object for transforming a javascript object into a different format.
 
+Basic usage
+
+
 ## Example
 
 This is an example of a mapper for transforming a playerhub search response from the original xml2json output.
