@@ -100,12 +100,6 @@ var offerItemsMapper = new Mapper()
 npm install js-object-mapper
 ```
 
-## Testing
-
-``` js
-npm test
-```
-
 ## Require it
 
 ``` js
