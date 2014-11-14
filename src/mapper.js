@@ -17,6 +17,16 @@ var Mapper = function(name){
   this.name = name || '';
   this.to = {}; // maps 'to' string to transform or submap so they can be easily accessed for unit testing
   this.paramTo = {}; // maps 'to' string to parameters so they can be easily accessed for unit testing
+  this.generatorOpts = {name: this.name};
+
+  if (process.env.MAPPER_TESTS_GEN === 'true') {
+    var stack = new Error().stack;
+
+    var mapperFile = stack.split('\n')[2].match(/\(.*\)/g)[0];
+    mapperFile = mapperFile.substr(1, mapperFile.indexOf('.js') + 2);
+    //console.log("mapper file", mapperFile);
+    this.generatorOpts.mapperFile = mapperFile; //absolute path to the mapperFile
+  }
 };
 
 var identityFn = function(v) {
@@ -121,8 +131,8 @@ Mapper.prototype = {
     }
     if (process.env.MAPPER_TESTS_GEN === 'true') {
       var generator = require('../tools/testGenerator');
-      //{output, path, ctxBase}
-      generator(input, context, out, {});
+
+      generator(input, context, out, this.generatorOpts);
     }
     return out;
   },
@@ -175,12 +185,13 @@ var get = function get(obj, path){
       return undefined;
     }
     var isArray = Array.isArray(pointer);
-    pointer = (isArray && pointer.length > 0 && isNaN(path[i])) ? pointer[0][path[i]] : pointer[path[i]];
+    var arrayCondition = (isArray && pointer.length > 0 && isNaN(path[i]));
+    pointer = arrayCondition ? pointer[0][path[i]] : pointer[path[i]];
     if (pointer === undefined) {
       return undefined;
     }
   }
-  return pointer ? (isArray && pointer.length > 0 && isNaN(path[i])) ? pointer[0][path[i]] : pointer[path[i]] : undefined;
+  return pointer ? arrayCondition ? pointer[0][path[i]] : pointer[path[i]] : undefined;
 };
 // make available externally
 Mapper.get = get;

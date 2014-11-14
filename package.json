@@ -22,9 +22,9 @@
   ],
   "engine": "node >= 0.10.12",
   "scripts": {
-    "test": "mocha tests && istanbul cover node_modules/mocha/bin/_mocha --dir ./.coverage -- --recursive ./tests/**/*.js --reporter spec"
+    "test": "mocha tests"
   },
-  "main": "./lib/mapper",
+  "main": "./src/mapper",
   "publishConfig": {
     "registry": "http://npm.eceit.net/"
   },

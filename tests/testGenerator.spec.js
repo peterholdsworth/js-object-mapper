@@ -5,7 +5,6 @@
 var should = require('should'),
     fs    = require('fs');
 var testGenerator = require('../tools/testGenerator');
-var mapper = require('../src/mapper');
 
 describe('testGenerator', function() {
 
@@ -13,25 +12,30 @@ describe('testGenerator', function() {
     process.env.MAPPER_TESTS_GEN = 'true';
   });
 
-  describe.skip('testGenerator from Mapper', function() {
+  describe('testGenerator from Mapper', function() {
 
-    it('should generate the test', function() {
-      var out = require('./sample-maps/mapgen_test').execute({'b': 1});
+    it('should generate test for each of the mappers run', function() {
+      require('./sample-maps/mapper-testgen1').execute({'b': 1});
+      require('./sample-maps/mapper-testgen2').execute([1,2]);
 
-      var generatedTest = fs.readFileSync('./testTest.js');
-      generatedTest.should.equal('TODO FILL IN');
+      var generatedTest1 = fs.readFileSync('./tests/mapper-testgen1.spec.js');
+      var generatedTest2 = fs.readFileSync('./tests/mapper-testgen2.spec.js');
+      generatedTest1.length.should.equal(445);
+      generatedTest2.toString().indexOf('{ arr: [ { x: 1 }, { x: 1 } ] }').should.eql(422);
+      generatedTest2.length.should.equal(468);
     });
 
-
-    afterEach(function (done) {
-      fs.unlink('./testTest.js', function() {
-        done();
-      });
+    it('should add describe block when existing spec is run again', function() {
+      require('./sample-maps/mapper-testgen1').execute({b: 3});
+      var generatedTest1 = fs.readFileSync('./tests/mapper-testgen1.spec.js').toString();
+      generatedTest1.match(/describe\(/g).length.should.eql(2);
     });
 
 
     after(function () {
-      delete process.env.PAPI_MAP_TESTS_GEN;
+      delete process.env.MAPPER_TESTS_GEN;
+      fs.unlinkSync('./tests/mapper-testgen1.spec.js');
+      fs.unlinkSync('./tests/mapper-testgen2.spec.js');
     });
 
   });
