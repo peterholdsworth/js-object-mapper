@@ -1,98 +1,29 @@
 ## js-object-mapper
 
 
-Use this library to construct a Mapper object for transforming a javascript object into a different format.
+Use this library to construct a Mapper object for transforming a javascript object into a different format with nice fluent api syntax.
 
 Basic usage
 
 
 ## Example
-
-This is an example of a mapper for transforming a playerhub search response from the original xml2json output.
-
+as in examples.js:
 ``` js
-var searchMapper = new Mapper()
+var Mapper = require('../src/mapper');
+var repos = require('./source.json');
 
-  .move('/currency',  // save currency in context
-    'S:Body.PackageProductResponse.@.Currency'
-  )
-  .move('stats.start',
-    'S:Body.PackageProductResponse.@.ShowingResultsFrom',
-    function(v){return parseInt(v,10)+'';}
-  )
-  .move('stats.end',
-    ['S:Body.PackageProductResponse.@.ShowingResultsFrom',
-     'S:Body.PackageProductResponse.@.ResultsPerPage'],
-    function(v){return parseInt(v[0],10)+parseInt(v[1],10)-1+'';}
-  )
-  .move('stats.total',
-    'S:Body.PackageProductResponse.@.ResultsTotal',
-    function(v){return parseInt(v,10)+'';}
-  )
-  .submap('products',
-    'S:Body.PackageProductResponse.Hotel',
-    { multiple:true,
-      condition: function(v){
-        var rpp = Mapper.get(v,'S:Body.PackageProductResponse.@.ResultsPerPage');
-        return !!(rpp && rpp*1>0);}
-    },
-    offerItemsMapper
-  )
-  .move('contentKeys',
-    'S:Body.PackageProductResponse.Hotel',
-    { condition: function(v){
-        var rpp = Mapper.get(v,'S:Body.PackageProductResponse.@.ResultsPerPage');
-        return !!(rpp && rpp*1>0);}
-    },
-    function(v){
-      var keys = {},id,contentId;
-      if(!Array.isArray(v)){v=[v];}
-      v.forEach(
-        function(w){
-          id = Mapper.get(w, 'References.GiataCode');
-          contentId = Mapper.get(w, 'HotelCodes.HotelCode.#');
-          if(id && contentId){keys[id] = contentId;}
-        }
-      );
-      return keys;
-    }
-  );
+var names = new Mapper().submap('repos', '', new Mapper().move('name', 'name')).execute(repos);
+
+console.log(names);   //{ repos:
+                      //  [ { name: 'ADE' },
+                      //          ...
+                      //    { name: 'o.deepObserve' }
+                      //  ]
+                      // }
 ```
 
-The first *move* takes the Currency attribute and stores it in a context which can be accessed elsewhere in the map. This is indicated by the / character preceding the context field name.
-
-The second *move* takes the ShowingResultsFrom attribute, applies a transformation to the field and stores it in stats.start.
-
-The third *move* shows how multiple input fields can be transformed.
-
-After the fourth move a *submap* (shown below) is used to transform S:Body.PackageProductResponse.Hotel to products. The multiple parameter ensures that the output is an array and the transformation only occurs if the condition function returns true. Mapper.get is used to safely a return a value, undefined if the input field is not present.
-
 ``` js
-var offerItemsMapper = new Mapper()
-  .move('id','References.GiataCode')
-  .move('ratings.starRating','@.Category.0', function(v){return v.charAt(0);})
-  .move('contentId','HotelCodes.HotelCode.#')
-  .submap('priceDetail','Offers.Offer', priceDetailMapper)
-  .submap('flights','Offers.Offer', {multiple:true}, GenericMapper.flightMapper)
-  .move('tourOperator.id','Offers.Offer.TourOperator.@.Code')
-  .move('tourOperator.name','Offers.Offer.TourOperator.#')
-  .assign('included', [])  //@TODO
-  .move('brandCode','Offers.Offer.TourOperator.@.Code')
-  .move('brochureName','Offers.Offer.@.TravelType')
-  .submap('rooms','Offers.Offer', {multiple:true}, roomInfoMapper)
-  .move('duration','Offers.Offer.@.LengthOfStay')
-  .move('occupation', '/occupation')
-  .move('hotelName.value','Name')
-  .assign('hotelName.uriFriendlyName','') //@TODO
-  .move('geoLocation.latitude','Location.GeoCode.@.Latitude')
-  .move('geoLocation.longitude','Location.GeoCode.@.Longitude')
-  .move('geoPath.value',['Location.Country.#','Location.Region.#','Location.City.#'],
-    function(v){ return (v[0] || '') + '/' + (v[1] || '') + '/' + (v[2] || '');})
-  .move('geoPath.uriFriendlyGeoPath',['Location.Country.#','Location.Region.#','Location.City.#'],
-    function(v){ return (v[0] || '') + '/' + (v[1] || '') + '/' + (v[2] || '');})
-  .move('resort','Location.Region.#',{default:''})
-  .move('destination','Location.City.#', {default:''})
-  .assign('descriptions',[]);
+
 ```
 
  *assign* is used to set an output field to a fixed value

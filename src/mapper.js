@@ -279,29 +279,33 @@ var assign = function assign(input, output, value, to, params, transform, contex
 var submap = function submap(input, output, from, to, params, transform, context, target, index){
   var multiple, unset = true;
   var out = (to.root === 'context') ? context : output;
-  if ((!params.condition) || params.condition.call(null, input, index, context)) {
-    var source = get((from.root === 'context') ? context : input, from.path);
-    if (source !== undefined) {
-      if (Array.isArray(source)) {
-        for (var i = 0; i < source.length; i++) {
-          if ((!params.filter) || params.filter(source[i], i, context)) {
-            multiple = (params.multiple === undefined) ? true : params.multiple; // if source is array default to multiple output
-            (multiple ? push : put)(out, to.path, transform.map(source[i], context, multiple ? null : get(out, to.path), target, i));
+  if (params) {
+    if ((!params.condition) || params.condition.call(null, input, index, context)) {
+      var source = get((from.root === 'context') ? context : input, from.path);
+      if (source !== undefined) {
+        if (Array.isArray(source)) {
+          for (var i = 0; i < source.length; i++) {
+            if ((!params.filter) || params.filter(source[i], i, context)) {
+              multiple = (params.multiple === undefined) ? true : params.multiple; // if source is array default to multiple output
+              (multiple ? push : put)(out, to.path, transform.map(source[i], context, multiple ? null : get(out, to.path), target, i));
+              unset = false;
+            }
+          }
+        } else {
+          multiple = (params.multiple === undefined) ? false : params.multiple; // if source is singleton default to singleton output
+          if ((!params.filter) || params.filter(source, undefined, context)) {
+            (multiple ? push : put)(out, to.path, transform.map(source, context, multiple ? null : get(out, to.path), target, null));
             unset = false;
           }
         }
-      } else {
-        multiple = (params.multiple === undefined) ? false : params.multiple; // if source is singleton default to singleton output
-        if ((!params.filter) || params.filter(source, undefined, context)) {
-          (multiple ? push : put)(out, to.path, transform.map(source, context, multiple ? null : get(out, to.path), target, null));
-          unset = false;
-        }
       }
     }
+
+    if (unset === true && params.default !== undefined) {
+      put(out, to.path, params.default);
+    }
   }
-  if (unset === true && params.default !== undefined) {
-    put(out, to.path, params.default);
-  }
+
   return output;
 };
 
