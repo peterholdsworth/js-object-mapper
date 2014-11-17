@@ -3,17 +3,19 @@
 
 Use this library to construct a Mapper object for transforming a javascript object into a different format with nice fluent api syntax.
 
-Basic usage
-
+Installation
+```
+npm i js-object-mapper
+```
 
 ## Example
 as in examples.js:
 ``` js
-var Mapper = require('../src/mapper');
-var repos = require('./source.json');
+var Mapper = require('js-object-mapper');
+var repos = require('./source.json');   //our source object is array of repos for a github user
 
 var names = new Mapper().submap('repos', '', new Mapper().move('name', 'name')).execute(repos);
-
+//returns array with object containing just one property
 console.log(names);   //{ repos:
                       //  [ { name: 'ADE' },
                       //          ...
