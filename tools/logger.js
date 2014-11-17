@@ -1,5 +1,5 @@
 var config = {debugLevel: process.env.MAPPER_LOG_LEVEL || 1};
-
+/* istanbul ignore next */
 module.exports = {
   debug: function() {
     if (config.debugLevel > 2) {

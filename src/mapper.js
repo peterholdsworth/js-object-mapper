@@ -19,14 +19,14 @@ var Mapper = function(name){
   this.paramTo = {}; // maps 'to' string to parameters so they can be easily accessed for unit testing
   this.generatorOpts = {name: this.name};
 
-  if (process.env.MAPPER_TESTS_GEN === 'true') {
+  //if (process.env.MAPPER_TESTS_GEN === 'true') {
     var stack = new Error().stack;
 
     var mapperFile = stack.split('\n')[2].match(/\(.*\)/g)[0];
     mapperFile = mapperFile.substr(1, mapperFile.indexOf('.js') + 2);
     //console.log("mapper file", mapperFile);
     this.generatorOpts.mapperFile = mapperFile; //absolute path to the mapperFile
-  }
+  //}
 };
 
 var identityFn = function(v) {
@@ -85,7 +85,7 @@ Mapper.prototype = {
       expandFrom = expand(from);
     }
     expandTo = expand(to);
-    this.ops.push({op:move, from:expandFrom, to:expandTo , params:params, transform:customjs});
+    this.ops.push({op:move, from:expandFrom, to:expandTo , params: params, transform: customjs});
     add(this.to, to, customjs);
     add(this.paramTo, to, params);
     return this;
@@ -97,7 +97,7 @@ Mapper.prototype = {
       params = {};
     } // handle missing params
     customjs = customjs || identityFn;
-    this.ops.push({op:assign, from:value, to:expand(to), params:params, transform:customjs});
+    this.ops.push({op: assign, from: value, to: expand(to), params: params, transform: customjs});
     add(this.to, to, customjs);
     add(this.paramTo, to, params);
     return this;
@@ -111,15 +111,16 @@ Mapper.prototype = {
       mapping = params;
       params = {};
     } // handle missing params
-    this.ops.push({op:submap, from:expand(from), to:expand(to), params:params, transform:mapping});
+    this.ops.push({op: submap, from: expand(from), to: expand(to), params: params, transform: mapping});
     add(this.to, to, mapping);
     add(this.paramTo, to, params);
     return this;
   },
   execute: function(input, context, output, target){
+    var out;
     try {
       target = []; // full path of the current target element (for error reporting)
-      var out = this.map(input, context, output, target);
+      out = this.map(input, context, output, target);
     } catch (error) {
       var e = new Error('Mapper failure');
       e.error = error;
@@ -127,7 +128,7 @@ Mapper.prototype = {
       e.target = target.map(function(v) {
         return ((v.root === 'object') ? '' : '/') + v.path.join('.');
       });
-      return e;
+      out = e;
     }
     if (process.env.MAPPER_TESTS_GEN === 'true') {
       var generator = require('../tools/testGenerator');

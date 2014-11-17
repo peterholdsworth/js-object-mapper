@@ -39,8 +39,8 @@ module.exports = function(input, context, output, opts) {
   logger.log('generation of test for a Mapper file: ', opts.mapperFile);
 
   var pathPrefix = opts.toPath || path.join('./', '/tests/');
-  var sep = path.sep;
-  var name = opts.mapperFile.substring(opts.mapperFile.lastIndexOf(sep)+1, opts.mapperFile.length - 2);
+
+  var name = opts.mapperFile.substring(opts.mapperFile.lastIndexOf(path.sep) + 1, opts.mapperFile.length - 2);
   var fileName = pathPrefix + name + 'spec.js';
   var testStr = '';
 
