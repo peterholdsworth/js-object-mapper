@@ -48,14 +48,9 @@ npm test
 var Mapper = require('mapper');    
 var mapping = new Mapper()
     .move(..);
+//The mapper can then be executed like this
+var mapResults = mapping.execute({a: 1});
 ```
-### Execute it
-
-The mapper can be executed like this:
-``` js
-mapResults = mapping.execute({a: 1});
-```
-
 An instance of Mapper may be configured by calling a cascade of move, assign and submap methods(described below).
 
 all methods take up to four parameters:
