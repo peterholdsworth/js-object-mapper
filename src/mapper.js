@@ -69,7 +69,7 @@ Mapper.prototype = {
    * @param {String} to
    * @param {String} from
    * @param {Object} [params]
-   * @param customjs
+   * @param {Function} [customjs] which is invoked with three arguments- value, index and context
    * @returns {Mapper}
    */
   move: function(to, from, params, customjs){
@@ -104,7 +104,7 @@ Mapper.prototype = {
    * @param {String} to
    * @param {*} value
    * @param {Object} [params]
-   * @param {Function} customjs which is invoked with three arguments- value, index and context
+   * @param {Function} [customjs] which is invoked with three arguments- value, index and context
    * @returns {Mapper}
    */
   assign: function(to, value, params, customjs){
@@ -120,11 +120,14 @@ Mapper.prototype = {
     return this;
   },
   /**
-   * @param {String} from path to the property you want to log. If '', the the whole object is logged.
+   * @param {String} [from=''] path to the property you want to log. If '', the the whole object is logged.
    *                 At the end just before execute, '' will log the whole output from mapper
    * @returns {Mapper}
    */
   log: function(from){
+    if (from === undefined) {
+      from = '';
+    }
     this.ops.push({op:log, from:expand(from)});
     return this;
   },
