@@ -55,13 +55,14 @@ An instance of Mapper may be configured by calling a cascade of move, assign and
 
 all methods take up to four parameters:
  
-   * to - string - dot separated name of target field (prefixed with / to indicate context rather than input or output)
-   * from - string - name of source field OR array of strings - names of input fields OR javascript literal - value
-   * options - an object with properties e.g. condition, filter, default etc. (described for each method). optional.
+   1. to - string - dot separated name of target field (prefixed with / to indicate context rather than input or output)
+   2. from - string - name of source field OR array of strings - names of input fields OR javascript literal - value
+   3. options - an object with properties e.g. condition, filter, default etc. (described for each method). optional.
 
-   * transform - javascript function (move and assign methods)
-   OR
-   * Mapper instance for submap method, passed the source field value or array of values, current index of mapped array, and the context object during execution
+   4. transform - javascript function (move and assign methods)
+   
+      OR
+    Mapper instance for submap method, passed the source field value or array of values, current index of mapped array, and the context object during execution
 
 
 When the instance is executed the transformations are carried out in the order in which they are defined.
@@ -74,7 +75,7 @@ The context may be used both to pass external variables into and out of the mapp
 but embedded within several sub-maps in the output. We can move it from source into the context in the top level map,
 and move it from the context to the output in an embedded sub-map.)
 
-Context is indicated by a leading / in the field label of a move command.
+Context is indicated by a leading / in the field label of a move command. As following diagram illustrates:
 
 ![context-source-output](docs/js_object_mapper.png)
 
