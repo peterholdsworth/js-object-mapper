@@ -86,6 +86,8 @@ and move it from the context to the output in an embedded sub-map.)
 
 Context is indicated by a leading / in the field label of a move command.
 
+![context-source-output](docs/js_object_mapper.svg)
+
 ## Operations
 
 1) **move**
