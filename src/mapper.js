@@ -50,6 +50,7 @@ var expand = function expand(v){ // expands dot separated string with optional c
   }
   return {root: root, path: (v ? v.split('.') : [])};
 };
+
 var add = function(object, property, value){
 // set or push property in object
   if(object[property]){ // repeated property
@@ -63,7 +64,15 @@ var add = function(object, property, value){
 };
 
 Mapper.prototype = {
-  move:  function(to, from, params, customjs){
+  /**
+   *
+   * @param {String} to
+   * @param {String} from
+   * @param {Object} [params]
+   * @param customjs
+   * @returns {Mapper}
+   */
+  move: function(to, from, params, customjs){
     var expandFrom, expandTo;
     if (params === undefined) {
       params = {};
@@ -90,6 +99,14 @@ Mapper.prototype = {
     add(this.paramTo, to, params);
     return this;
   },
+  /**
+   *
+   * @param {String} to
+   * @param {*} value
+   * @param {Object} [params]
+   * @param {Function} customjs which is invoked with three arguments- value, index and context
+   * @returns {Mapper}
+   */
   assign: function(to, value, params, customjs){
     params = params || {};
     if (params instanceof Function) {
@@ -102,10 +119,22 @@ Mapper.prototype = {
     add(this.paramTo, to, params);
     return this;
   },
+  /**
+   * @param {String} from path to the property you want to log. If '', the the whole object is logged.
+   *                 At the end just before execute, '' will log the whole output from mapper
+   * @returns {Mapper}
+   */
   log: function(from){
     this.ops.push({op:log, from:expand(from)});
     return this;
   },
+  /**
+   * @param {String} to
+   * @param {String} from
+   * @param {Object} [params]
+   * @param {Mapper} mapping
+   * @returns {Mapper}
+   */
   submap: function(to, from, params, mapping){
     if (params instanceof Mapper) {
       mapping = params;
@@ -116,6 +145,14 @@ Mapper.prototype = {
     add(this.paramTo, to, params);
     return this;
   },
+  /**
+   *
+   * @param {Object} input
+   * @param {Object} [context]
+   * @param {Object} [output] this param is passed when chaining
+   * @param {Array<String>} [target]
+   * @returns {*}
+   */
   execute: function(input, context, output, target){
     var out;
     try {
@@ -279,31 +316,30 @@ var assign = function assign(input, output, value, to, params, transform, contex
 var submap = function submap(input, output, from, to, params, transform, context, target, index){
   var multiple, unset = true;
   var out = (to.root === 'context') ? context : output;
-  if (params) {
-    if ((!params.condition) || params.condition.call(null, input, index, context)) {
-      var source = get((from.root === 'context') ? context : input, from.path);
-      if (source !== undefined) {
-        if (Array.isArray(source)) {
-          for (var i = 0; i < source.length; i++) {
-            if ((!params.filter) || params.filter(source[i], i, context)) {
-              multiple = (params.multiple === undefined) ? true : params.multiple; // if source is array default to multiple output
-              (multiple ? push : put)(out, to.path, transform.map(source[i], context, multiple ? null : get(out, to.path), target, i));
-              unset = false;
-            }
-          }
-        } else {
-          multiple = (params.multiple === undefined) ? false : params.multiple; // if source is singleton default to singleton output
-          if ((!params.filter) || params.filter(source, undefined, context)) {
-            (multiple ? push : put)(out, to.path, transform.map(source, context, multiple ? null : get(out, to.path), target, null));
+
+  if ((!params.condition) || params.condition.call(null, input, index, context)) {
+    var source = get((from.root === 'context') ? context : input, from.path);
+    if (source !== undefined) {
+      if (Array.isArray(source)) {
+        for (var i = 0; i < source.length; i++) {
+          if ((!params.filter) || params.filter(source[i], i, context)) {
+            multiple = (params.multiple === undefined) ? true : params.multiple; // if source is array default to multiple output
+            (multiple ? push : put)(out, to.path, transform.map(source[i], context, multiple ? null : get(out, to.path), target, i));
             unset = false;
           }
         }
+      } else {
+        multiple = (params.multiple === undefined) ? false : params.multiple; // if source is singleton default to singleton output
+        if ((!params.filter) || params.filter(source, undefined, context)) {
+          (multiple ? push : put)(out, to.path, transform.map(source, context, multiple ? null : get(out, to.path), target, null));
+          unset = false;
+        }
       }
     }
+  }
 
-    if (unset === true && params.default !== undefined) {
-      put(out, to.path, params.default);
-    }
+  if (unset === true && params.default !== undefined) {
+    put(out, to.path, params.default);
   }
 
   return output;
