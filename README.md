@@ -46,33 +46,28 @@ npm test
 
 ``` js
 var Mapper = require('mapper');    
-var searchMapper = new Mapper()
-    .move(..........
+var mapping = new Mapper()
+    .move(..);
 ```
 ### Execute it
 
 The mapper can be executed like this:
 ``` js
-mapResults = searchMapper.execute(input, context);
+mapResults = mapping.execute({a: 1});
 ```
 
 An instance of Mapper may be configured by calling a cascade of move, assign and submap methods(described below).
 
-Each method takes four parameters:
+all methods take up to four parameters:
  
    * to - string - dot separated name of target field (prefixed with / to indicate context rather than input or output)
    * from - string - name of source field OR array of strings - names of input fields OR javascript literal - value
-   * parameters - an object with properties e.g. condition, filter, default etc. (described for each method). optional.
-   * transform - javascript function OR Mapper instance.  Passed the source field value or array of values, current index of mapped array, and the context object during execution
-   
+   * options - an object with properties e.g. condition, filter, default etc. (described for each method). optional.
 
-``` js
-var offerItemsMapper = new Mapper()
-  .move('id','References.GiataCode')
-  .move('ratings.starRating','@.Category.0', function(v){return v.charAt(0);})
-  .submap('flights','Offers.Offer', {multiple:true}, GenericMapper.flightMapper)
-  .assign('descriptions',[]);
-```
+   * transform - javascript function (move and assign methods)
+   OR
+   * Mapper instance for submap method, passed the source field value or array of values, current index of mapped array, and the context object during execution
+
 
 When the instance is executed the transformations are carried out in the order in which they are defined.
 
@@ -88,13 +83,13 @@ Context is indicated by a leading / in the field label of a move command.
 
 ![context-source-output](docs/js_object_mapper.png)
 
-## Operations
+## Operations and possible options
 
 1) **move**
 
 A *move* takes to value of an input field and sets an output field to this value.
 
-Parameters:
+Options:
 
 `default`: javascript literal used as input value if the source field is not present
 `condition`: javascript function of full source object which must return true for the move to be executed
@@ -102,7 +97,7 @@ Parameters:
 
 2) **assign**
 
-Parameters:
+Options:
 
 `condition`: javascript function of full source object which must return true for the move to be executed
 
@@ -111,7 +106,7 @@ Parameters:
 A *submap* is an instance of Mapper which is applied to a field of the source object to generate a field of the target object.
 If the source object is an array then, by default, sub-map will be applied to each element of the array,  generating an output array.
 
-Parameters:
+Options:
 
 `filter`: function of array element and context returning boolean. Array element will only be pushed onto target field if true
 `condition`: javascript function of full source object which must return true for the sub-map to be executed

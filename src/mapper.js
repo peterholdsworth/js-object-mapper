@@ -350,7 +350,8 @@ var submap = function submap(input, output, from, to, params, transform, context
 
 
 var log = function log(input, output, from, to, params, transform, context, target, index) {
-  console.log('==============start mapping log: ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
+  var n = this.name || this.generatorOpts.mapperFile;
+  console.log('==============start mapping log: ' + n + ' ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
   console.log(util.inspect(get((from.root === 'context') ? context : output, from.path), {depth: null}));
   console.log('================end mapping log: ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
 };

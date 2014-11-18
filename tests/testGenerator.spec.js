@@ -53,7 +53,7 @@ describe('testGenerator', function() {
   describe('testGenerator directly', function() { //tests from running maps.execute are not picked up by istanbul
      it('should generate when called directly', function(){
        var file = path.resolve("./sample-maps/mapper-error-throwing.js");
-       var opts = {"name":"mapperWithError","mapperFile": file};
+       var opts = {"name":"mapperWithError", "mapperFile": file};
        var errOut = new Error('error for test');
        errOut.message =  'Mapper failure';
        errOut.mapper = "mapperWithError";

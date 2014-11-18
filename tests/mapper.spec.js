@@ -521,6 +521,11 @@ describe("Mapper", function() {
     o.should.eql({a: []});
   });
 
+  it("should throw when submap doesn't get a new instance of Mapper", function(){
+    o = m.submap('a', 'b').execute();
+    (o instanceof Error).should.eql(true);
+  });
+
   it('should push to a deeply nested field within an array', function() {
     m.move('a.0.b', 'c', {multiple: true});
     o = m.execute({c: 1});
