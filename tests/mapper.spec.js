@@ -12,6 +12,11 @@ describe("Mapper", function() {
     m = new Mapper();
   });
 
+  it('should take just field a', function(){
+    o = m.take('b').log().execute({a: 9, b: 11});
+    o.should.eql({b: 11});
+  });
+
   it("should move field a to field b", function() {
     m.move('b', 'a');
     o = m.execute({a: 1});

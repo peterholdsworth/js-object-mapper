@@ -1,6 +1,8 @@
 var Mapper = require('../src/mapper');
 var repos = require('./source.json');
 
+new Mapper().take('a').log().execute({a: 9, b: 11});
+
 var out = new Mapper('repos').submap('repos', '', new Mapper().move('name', 'name')).log().execute(repos);
 //{ repos:
 //  [ { name: 'ADE' },

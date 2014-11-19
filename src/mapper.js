@@ -65,6 +65,17 @@ var add = function(object, property, value){
 
 Mapper.prototype = {
   /**
+   * uses as move('a') instead of move('a', 'a')
+   * @param {String} from
+   * @returns {Mapper}
+   */
+  take: function(from) {
+    var objPath = expand(from);
+    this.ops.push({op: move, from: objPath, to: objPath, params: {}, transform: identityFn});
+    add(this.to, from);
+    return this;
+  },
+  /**
    *
    * @param {String} to
    * @param {String} from
@@ -94,7 +105,7 @@ Mapper.prototype = {
       expandFrom = expand(from);
     }
     expandTo = expand(to);
-    this.ops.push({op:move, from:expandFrom, to:expandTo , params: params, transform: customjs});
+    this.ops.push({op:move, from:expandFrom, to:expandTo, params: params, transform: customjs});
     add(this.to, to, customjs);
     add(this.paramTo, to, params);
     return this;
@@ -274,16 +285,18 @@ var push = function push(obj, path, value){
 var move = function move(input, output, from, to, params, transform, context, target, index){
   var value;
   if ((!params.condition) || params.condition.call(null, input, index, context)){
-    if (Array.isArray(from)){
-      value = from.map(function(v){return get((v.root==='object')?input:context, v.path);});
-    } else if ( from.root === 'object'){
+    if (Array.isArray(from)) {
+      value = from.map(function(v) {
+        return get((v.root === 'object') ? input : context, v.path);
+      });
+    } else if (from.root === 'object') {
       value = get(input, from.path);
     } else if (from.root === 'context'){
       value = get(context, from.path);
     } else { // object of fields
       value = {};
       for (var i in from){
-        value[i] =  get((from[i].root==='object')?input:context, from[i].path);
+        value[i] = get((from[i].root === 'object') ? input : context, from[i].path);
       }
     }
     if ((value !== undefined) && transform){ value = transform(value, index, context);}
