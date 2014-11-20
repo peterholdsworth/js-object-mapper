@@ -13,7 +13,7 @@ describe("Mapper", function() {
   });
 
   it('should take just field a', function(){
-    o = m.take('b').log().execute({a: 9, b: 11});
+    o = m.move('b').log().execute({a: 9, b: 11});
     o.should.eql({b: 11});
   });
 

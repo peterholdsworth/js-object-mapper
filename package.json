@@ -22,8 +22,8 @@
   ],
   "engine": "node >= 0.10.12",
   "scripts": {
-    "test": "mocha tests",
-    "cov": "istanbul cover node_modules/mocha/bin/_mocha --dir ./.coverage -- --recursive ./tests/**/*.js --reporter spec && istanbul check-coverage --statements 90 --functions 90 --lines 90 --branches 90"
+    "test": "mocha",
+    "cov": "istanbul cover node_modules/mocha/bin/_mocha --dir ./.coverage -- --recursive ./test/**/*.js --reporter spec && istanbul check-coverage --statements 90 --functions 90 --lines 90 --branches 90"
   },
   "main": "./src/mapper",
   "publishConfig": {

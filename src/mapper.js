@@ -65,26 +65,18 @@ var add = function(object, property, value){
 
 Mapper.prototype = {
   /**
-   * uses as move('a') instead of move('a', 'a')
-   * @param {String} from
-   * @returns {Mapper}
-   */
-  take: function(from) {
-    var objPath = expand(from);
-    this.ops.push({op: move, from: objPath, to: objPath, params: {}, transform: identityFn});
-    add(this.to, from);
-    return this;
-  },
-  /**
    *
-   * @param {String} to
-   * @param {String} from
+   * @param {String} to property on the output
+   * @param {String} [from] if not supplied, same as 'to' param
    * @param {Object} [params]
    * @param {Function} [customjs] which is invoked with three arguments- value, index and context
    * @returns {Mapper}
    */
   move: function(to, from, params, customjs){
     var expandFrom, expandTo;
+    if (from === undefined) {
+      from = to;
+    }
     if (params === undefined) {
       params = {};
     }

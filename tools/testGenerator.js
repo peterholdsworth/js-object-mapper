@@ -38,7 +38,7 @@ var indent = function (str, tabs, noNewLine) {
 module.exports = function(input, context, output, opts) {
   logger.log('generation of test for a Mapper file: ', opts.mapperFile);
 
-  var pathPrefix = opts.toPath || path.join('./', '/tests/');
+  var pathPrefix = opts.toPath || path.join('./', '/test/');
 
   var name = opts.mapperFile.substring(opts.mapperFile.lastIndexOf(path.sep) + 1, opts.mapperFile.length - 2);
   var fileName = pathPrefix + name + 'spec.js';
