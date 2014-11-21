@@ -110,7 +110,6 @@ var formatMapper = function(mapper){
     targetList.pop();
   }
   print("});");
-  print();
 };
 
 try {
@@ -130,4 +129,5 @@ try {
 } catch (err) {
   console.error('Error processing mapper file: ' + process.argv[2]);
   console.error(err.stack);
+  process.exit();
 }

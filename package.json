@@ -23,7 +23,8 @@
   "engine": "node >= 0.10.12",
   "scripts": {
     "test": "mocha",
-    "cov": "istanbul cover node_modules/mocha/bin/_mocha --dir ./.coverage -- --recursive test/ --reporter spec && istanbul check-coverage --statements 90 --functions 90 --lines 90 --branches 90"
+    "cov": "istanbul cover node_modules/mocha/bin/_mocha --report none --dir ./.coverage -- test/ --reporter spec && istanbul report --root ./.coverage --dir ./.coverage",
+    "check": "istanbul cover node_modules/mocha/bin/_mocha --report none --dir ./.coverage -- test/ --reporter spec && istanbul check-coverage --statements 90 --functions 90 --lines 90 --branches 90"
   },
   "main": "./src/mapper",
   "publishConfig": {
@@ -43,7 +44,6 @@
   "devDependencies": {
     "istanbul": "^0.3.2",
     "mocha": "~2.0",
-    "precommit-hook": "1.0.7",
     "should": "^4.3.0"
   },
   "readmeFilename": "README.md",
@@ -66,9 +66,5 @@
     }
   ],
   "_shasum": "9c41a23e5a56981ffe09ba4090bd2f8c47d9d89e",
-  "_resolved": "http://npm.eceit.net/tc-js-object-mapper/-/tc-js-object-mapper-1.0.0-0002-cbcf2ca0.tgz",
-  "precommit": [
-    "test",
-    "cov"
-  ]
+  "_resolved": "http://npm.eceit.net/tc-js-object-mapper/-/tc-js-object-mapper-1.0.0-0002-cbcf2ca0.tgz"
 }
