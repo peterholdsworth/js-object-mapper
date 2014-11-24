@@ -224,18 +224,12 @@ var get = function get(obj, path){
     return obj;
   }
   var pointer = obj;
-  for (var i = 0; i < path.length - 1; i++) {
-    if (!(pointer instanceof Object)) {
-      return undefined;
-    }
-    var isArray = Array.isArray(pointer);
-    var arrayCondition = (isArray && pointer.length > 0 && isNaN(path[i]));
-    pointer = arrayCondition ? pointer[0][path[i]] : pointer[path[i]];
-    if (pointer === undefined) {
-      return undefined;
-    }
+  for ( var i = 0; i < path.length-1; i++) {
+    if (!(pointer instanceof Object)) {return undefined;}
+    pointer = (Array.isArray(pointer) && pointer.length > 0 && isNaN(path[i]))? pointer[0][path[i]] : pointer[path[i]];
+    if ( pointer === undefined ) {return undefined;}
   }
-  return pointer ? arrayCondition ? pointer[0][path[i]] : pointer[path[i]] : undefined;
+  return pointer?(Array.isArray(pointer) && pointer.length > 0 && isNaN(path[i]))? pointer[0][path[i]] :pointer[path[i]]:undefined;
 };
 // make available externally
 Mapper.get = get;
