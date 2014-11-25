@@ -1,29 +1,28 @@
-/*global describe, it, before, after*/
+/*global describe, it, beforeEach*/
 
 var should = require('should');
-var util = require('util');
 var Mapper = require('../src/mapper');
 var m, o, i;
 
 
-describe("Mapper", function() {
+describe('Mapper', function() {
 
   beforeEach(function() {
     m = new Mapper();
   });
 
-  it('should take just field a', function(){
+  it('should move field b to b', function(){
     o = m.move('b').log().execute({a: 9, b: 11});
     o.should.eql({b: 11});
   });
 
-  it("should move field a to field b", function() {
+  it('should move field a to field b', function() {
     m.move('b', 'a');
     o = m.execute({a: 1});
     o.should.eql({b: 1});
   });
 
-  it("should conditionally move field a to field b", function() {
+  it('should conditionally move field a to field b', function() {
     m.move('b', 'a', {
       condition: function() {
         return true;
@@ -38,7 +37,7 @@ describe("Mapper", function() {
     o.should.eql({ a: [ { number: { a: 1 } }, { number: { a: 2 } } ] });
   });
 
-  it("should conditionally not move field a to field b", function() {
+  it('should conditionally not move field a to field b', function() {
     m.move('b', 'a', {
         condition: function() {
           return false;
@@ -48,7 +47,7 @@ describe("Mapper", function() {
     o.should.eql({});
   });
 
-  it("should conditionally not move field a to field b with default", function() {
+  it('should conditionally not move field a to field b with default', function() {
     m.move('b', 'a', {
       condition: function() {
         return false;
@@ -58,7 +57,7 @@ describe("Mapper", function() {
     o.should.eql({b: 2});
   });
 
-  it("should conditionally not move field a to field /b with default", function() {
+  it('should conditionally not move field a to field /b with default', function() {
     m.move('/b', 'a', {
         condition: function() {
           return false;
@@ -69,7 +68,7 @@ describe("Mapper", function() {
     o.should.eql({b: 2});
   });
 
-  it("should move field a to field b twice", function() {
+  it('should move field a to field b twice', function() {
     m.move('b', 'a');
     o = m.execute({a: 1});
     o.should.eql({b: 1});
@@ -79,50 +78,62 @@ describe("Mapper", function() {
     o.should.eql({b: 1});
   });
 
-  it("should move field a to field b and c to d", function() {
+  it('should move field a to field b and c to d', function() {
     m.move('b', 'a')
       .move('d', 'c');
     o = m.execute({a: 1, c: 2});
     o.should.eql({b: 1, d: 2});
   });
 
-  it("should move empty field a to field b default", function() {
+  it('should move empty field a to field b default', function() {
     m.move('b', 'a', {default: 1});
     o = m.execute({});
     o.should.eql({b: 1});
   });
 
-  it("should move field a.b to field c", function() {
+  it('should move field a.b to field c', function() {
     m.move('c', 'a.b');
     o = m.execute({a: {b: 1}});
     o.should.eql({c: 1});
   });
 
-  it("should move field a to field b.c", function() {
+  it('should move field a to field b.c', function() {
     m.move('b.c', 'a');
     o = m.execute({a: 1});
     o.should.eql({b: {c: 1}});
   });
 
-  it("should move field a to field b.0", function() {
+  it('should move field a to field b.0', function() {
     m.move('b.0', 'a');
     o = m.execute({a: 1});
     o.should.eql({b: [1]});
   });
 
-  it("should move field a to field b.1", function() {
+  it('should move field a to field b.1', function() {
     m.move('b.1', 'a');
     o = m.execute({a: 1});
     o.should.eql({b: [, 1]});
   });
 
-  it("should move field a to field c.0 and b to c.1", function() {
+  it('should move field a to field c.0 and b to c.1', function() {
     m.move('c.0', 'a').move('c.1', 'b');
     o = m.execute({a: 1, b: 2});
     o.should.eql({c: [1, 2]});
   });
 
-  it("should apply a custom transform", function() {
+  it('should move field a.b.c from first element of b array', function() {
+    m.move('d', 'a.b.c');
+    o = m.execute({a: [ {b:{c:1}}, {b:{c:2}} ]});
+    o.should.eql({d:1});
+  });
+
+  it('should move field a.b from first element of array at leaf', function() {
+    m.move('c', 'a.b');
+    o = m.execute({a: [{b:1}, {b:2}]});
+    o.should.eql({c:1});
+  });
+
+  it('should apply a custom transform', function() {
     m.move('b', 'a', {}, function(v) {
       return v.trim();
     });
@@ -130,7 +141,7 @@ describe("Mapper", function() {
     o.should.eql({b: 'h'});
   });
 
-  it("should apply a custom transform (no parameters)", function() {
+  it('should apply a custom transform (no parameters)', function() {
     m.move('b', 'a', function(v) {
       return v.trim();
     });
@@ -138,7 +149,7 @@ describe("Mapper", function() {
     o.should.eql({b: 'h'});
   });
 
-  it("should conditionally assign a field", function() {
+  it('should conditionally assign a field', function() {
     m.assign('b', 1, {
       condition: function() {
         return false;
@@ -148,14 +159,14 @@ describe("Mapper", function() {
     o.should.eql({});
   });
 
-  it("should assign a field", function() {
+  it('should assign a field', function() {
     m.assign('b', 1);
     o = m.execute({});
     o.should.eql({b: 1});
   });
 
 
-  it("should assign a field and apply a transform", function() {
+  it('should assign a field and apply a transform', function() {
     m.assign('b', '  h  ', function(v) {
       return v.trim();
     });
@@ -163,13 +174,13 @@ describe("Mapper", function() {
     o.should.eql({b: 'h'});
   });
 
-  it("should assign a field and move c to d", function() {
+  it('should assign a field and move c to d', function() {
     m.assign('b', 1).move('d', 'c');
     o = m.execute({c: 2});
     o.should.eql({b: 1, d: 2});
   });
 
-  it.skip("should move field a to field b and c to d 10,000 times within 100 milliseconds", function() {
+  it.skip('should move field a to field b and c to d 10,000 times within 100 milliseconds', function() {
     m.move('b', 'a').move('d', 'c');
     var before = process.hrtime();
     for (i = 0; i < 10000; i++) {
@@ -181,13 +192,13 @@ describe("Mapper", function() {
     diff[1].should.be.below(140 * 1000 * 1000);
   });
 
-  it("should move field a to multiple field b", function() {
+  it('should move field a to multiple field b', function() {
     m.move('b', 'a', {multiple: true});
     o = m.execute({a: 1});
     o.should.eql({b: [1]});
   });
 
-  it("should move field a and b to multiple field c", function() {
+  it('should move field a and b to multiple field c', function() {
     m.move('c', 'a', {multiple: true})
       .move('c', 'b', {multiple: true});
     o = m.execute({a: 1, b: 2});
@@ -195,7 +206,7 @@ describe("Mapper", function() {
   });
 
 
-  it("should move field a and b to multiple field c.d", function() {
+  it('should move field a and b to multiple field c.d', function() {
     m.move('c.d', 'a', {multiple: true})
       .move('c.d', 'b', {multiple: true});
     o = m.execute({a: 1, b: 2});
@@ -203,33 +214,33 @@ describe("Mapper", function() {
   });
 
 
-  it("should move field a to b using a submap", function() {
+  it('should move field a to b using a submap', function() {
     m.submap('b', 'a', {}, new Mapper().move('d', 'c'));
     o = m.execute({a: {c: 1}});
     o.should.eql({b: {d: 1}});
   });
 
-  it("should move field a to b using a submap with no parameters", function() {
+  it('should move field a to b using a submap with no parameters', function() {
     m.submap('b', 'a', new Mapper().move('d', 'c'));
     o = m.execute({a: {c: 1}});
     o.should.eql({b: {d: 1}});
   });
 
-  it("should map field a to b using a submap from top level", function() {
+  it('should map field a to b using a submap from top level', function() {
     m.submap('b', '', {}, new Mapper().move('d', 'a'));
     o = m.execute({a: 1});
     o.should.eql({b: {d: 1}});
   });
 
 
-  it("should map multiple field a to multiple field b using a submap", function() {
+  it('should map multiple field a to multiple field b using a submap', function() {
     m.submap('b', 'a', {}, new Mapper().move('d', 'c'));
     o = m.execute({a: [{c: 1}, {c: 2}]});
     o.should.eql({b: [{d: 1}, {d: 2}]});
   });
 
 
-  it("should map multiple field a to single field b using a submap with filter", function() {
+  it('should map multiple field a to single field b using a submap with filter', function() {
     m.submap('b', 'a',
       {
         multiple: false,
@@ -242,7 +253,7 @@ describe("Mapper", function() {
     o.should.eql({b: {e: 2}});
   });
 
-  it("should map from array of fields a and b using a transform", function() {
+  it('should map from array of fields a and b using a transform', function() {
     m.move('c', ['a', 'b'], function(v) {
       return v[0] + v[1];
     });
@@ -250,7 +261,7 @@ describe("Mapper", function() {
     o.should.eql({c: 'ab'});
   });
 
-  it("should map from an object of fields a and b using a transform", function() {
+  it('should map from an object of fields a and b using a transform', function() {
     m.move('c', {a: 'a', b: 'b'}, function(v) {
       return '' + v.a + v.b;
     });
@@ -258,7 +269,7 @@ describe("Mapper", function() {
     o.should.eql({c: 'ab'});
   });
 
-  it("should map mobile phone and home phone to phones array", function() {
+  it('should map mobile phone and home phone to phones array', function() {
     m.move('phones', 'homePhone', {multiple: true}, function(v) {
       return {type: 'home', number: v};
     })
@@ -269,7 +280,7 @@ describe("Mapper", function() {
     o.should.eql({phones: [{type: 'home', number: 1}, {type: 'mobile', number: 2}]});
   });
 
-  it("should map phones array to mobile phone and home phone by submap", function() { // bug - second submap overwrites the first
+  it('should map phones array to mobile phone and home phone by submap', function() { // bug - second submap overwrites the first
     m.submap('telephone', 'phones', {
         multiple: false, filter: function(v) {
           return v.type === 'home';
@@ -284,7 +295,7 @@ describe("Mapper", function() {
     o.should.eql({telephone: {homePhone: 1, mobilePhone: 2}});
   });
 
-  it("should map phones array to mobile phone and home phone by move", function() {
+  it('should map phones array to mobile phone and home phone by move', function() {
     m
       .move('homePhone', 'phones', function(v) {
         return v.filter(function(v) {
@@ -300,13 +311,13 @@ describe("Mapper", function() {
     o.should.eql({homePhone: 1, mobilePhone: 2});
   });
 
-  it("should map field a to b using a submap of a submap", function() {
+  it('should map field a to b using a submap of a submap', function() {
     m.submap('d', 'a', {}, new Mapper().submap('e', 'b', {}, new Mapper().move('f', 'c')));
     o = m.execute({a: {b: {c: 1}}});
     o.should.eql({d: {e: {f: 1}}});
   });
 
-  it("should throw an Error('Mapper failure') if a transform fails", function() {
+  it('should throw an Error(\'Mapper failure\') if a transform fails', function() {
     m = new Mapper('fail').move('a', 'b', {}, function(b) {
       return b.c.d;
     });
@@ -314,7 +325,15 @@ describe("Mapper", function() {
     o.should.be.instanceOf(Error);
   });
 
-  it("should return array of targets when a submap fails", function() {
+  it('should throw an Error(\'Mapper failure\') if a transform fails mapping to context', function() {
+    m = new Mapper('fail').move('/a', 'b', {}, function(b) {
+      return b.c.d;
+    });
+    o = m.execute({b: 1});
+    o.should.be.instanceOf(Error);
+  });
+
+  it('should return array of targets when a submap fails', function() {
     m = new Mapper('top').submap('d', 'a', {}, new Mapper().submap('e', 'b', {}, new Mapper().move('f', 'c', function() {
       return g.h;
     })));
@@ -325,7 +344,7 @@ describe("Mapper", function() {
     // console.log(util.inspect(o, {depth:null}));
   });
 
-  it("should let me safely get the toplevel within a function", function() {
+  it('should let me safely get the toplevel within a transform', function() {
     m.move('z', '', {}, function(v) {
       return Mapper.get(v, '');
     });
@@ -333,7 +352,23 @@ describe("Mapper", function() {
     o.should.eql({z: {d: 1}});
   });
 
-  it("should let me safely get a deeply nested property in a transform", function() {
+  it('should let me safely get a missing field within a transform', function() {
+    m.move('z', '', {}, function(v) {
+      return Mapper.get(v, 'a.b.c.d');
+    });
+    o = m.execute({d: 1});
+    o.should.eql({});
+  });
+
+  it('should let me safely get a missing leaf field within a transform', function() {
+    m.move('z', '', {}, function(v) {
+      return Mapper.get(v, 'a');
+    });
+    o = m.execute({d: 1});
+    o.should.eql({});
+  });
+
+  it('should let me safely get a deeply nested property in a transform', function() {
     m.move('z', 'a', {}, function(v) {
       return Mapper.get(v, 'b.c.d');
     });
@@ -341,7 +376,7 @@ describe("Mapper", function() {
     o.should.eql({z: 1});
   });
 
-  it("should let me safely get a deeply nested property in a transform with mis-spelled last property", function() {
+  it('should let me safely get a deeply nested property in a transform with mis-spelled last property', function() {
     m.move('z', 'a', {}, function(v) {
       return Mapper.get(v, 'b.c.dd');
     });
@@ -349,7 +384,7 @@ describe("Mapper", function() {
     o.should.eql({});
   });
 
-  it("should let me safely get a deeply nested property in a transform with mis-spelled penultimate property", function() {
+  it('should let me safely get a deeply nested property in a transform with mis-spelled penultimate property', function() {
     m.move('z', 'a', {}, function(v) {
       return Mapper.get(v, 'b.cc.d');
     });
@@ -357,7 +392,7 @@ describe("Mapper", function() {
     o.should.eql({});
   });
 
-  it("should let me safely get a deeply nested property in a transform with mis-spelled two from last property ", function() {
+  it('should let me safely get a deeply nested property in a transform with mis-spelled two from last property ', function() {
     m.move('z', 'a', {}, function(v) {
       return Mapper.get(v, 'bb.c.d');
     });
@@ -365,7 +400,7 @@ describe("Mapper", function() {
     o.should.eql({});
   });
 
-  it("should correctly assign to a context variable", function() {
+  it('should correctly assign to a context variable', function() {
     m.submap('A', 'a', {multiple: true}, new Mapper()
         .assign('/B', null) // does not work if you .assign('/B', []). Should clone object value before assignment
         .submap('/B', 'b', {multiple: true}, new Mapper()
@@ -387,28 +422,28 @@ describe("Mapper", function() {
     o.should.eql({A: [{B: [1, 2]}, {B: [3, 4]}]});
   });
 
-  it("should move with multiple option by pushing to an array", function() {
+  it('should move with multiple option by pushing to an array', function() {
     m.move('c', 'a', {multiple: true})
       .move('c', 'b', {multiple: true});
     o = m.execute({a: 1, b: 2});
     o.should.eql({c: [1, 2]});
   });
 
-  it("should support JSONPath", function() {
+  it('should support JSONPath', function() {
                   //root operator and recursive descent
     m.move('c', '$..c', {multiple: true});
     o = m.execute({a: {b: {c: 1}, c: 2}});
     o.should.eql({c: [2, 1]});
   });
 
-  it("should give access to transforms for unit testing", function() {
+  it('should give access to transforms for unit testing', function() {
     m.move('a', 'b', function(v) {
       return -Math.round(-v);
     });
     m.to.a(0.5).should.eql(0);
   });
 
-  it("should give access to nested transforms for unit testing", function() {
+  it('should give access to nested transforms for unit testing', function() {
     m.submap('a', 'b', {}, new Mapper()
         .move('c', 'd', {}, function(v) {
           return -Math.round(-v);
@@ -417,7 +452,7 @@ describe("Mapper", function() {
     m.to.a.to.c(0.5).should.eql(0);
   });
 
-  it("should give access to transforms to same target for unit testing", function() {
+  it('should give access to transforms to same target for unit testing', function() {
     m.move('c', 'a', {multiple: true}, function(v) {
       return Math.round(v);
     })
@@ -428,7 +463,7 @@ describe("Mapper", function() {
     m.to.c[1](0.5).should.eql(0);
   });
 
-  it("should give access to parameters for unit testing", function() {
+  it('should give access to parameters for unit testing', function() {
     m.move('a', 'b', {
         condition: function() {
           return false;
@@ -438,9 +473,9 @@ describe("Mapper", function() {
   });
 
 
-  it("should map field a to b using a submap with conditional move", function() {
+  it('should map field a to b using a submap with conditional move', function() {
     m.submap('b', 'a', {}, new Mapper().move('d', 'c', {
-      condition: function(v, i, c) {
+      condition: function(v, i) {
         return i === 0;
       }
     }));
@@ -448,7 +483,7 @@ describe("Mapper", function() {
     o.should.eql({b: [{d: 1}, {}]});
   });
 
-  it("should default conditionally map field a to b using a submap", function() {
+  it('should default conditionally map field a to b using a submap', function() {
     m.submap('b', 'a', {
       condition: function() {
         return false;
@@ -458,10 +493,10 @@ describe("Mapper", function() {
     o.should.eql({b: 1});
   });
 
-  it("should map field a to b using a submap with conditional submap", function() {
+  it('should map field a to b using a submap with conditional submap', function() {
     m.submap('b', 'a', {}, new Mapper()
         .submap('d', 'c', {
-          condition: function(v, i, c) {
+          condition: function(v, i) {
             return i === 0;
           }
         }, new Mapper()
@@ -472,13 +507,13 @@ describe("Mapper", function() {
     o.should.eql({b: [{d: {f: 1}}, {}]});
   });
 
-  it("should log output value", function() {
+  it('should log output value', function() {
     m.move('a', 'b').log('a');
     o = m.execute({b: 1});
     o.should.eql({a: 1});
   });
 
-  it("should log context value", function() {
+  it('should log context value', function() {
     m.move('/a', 'b').log('/a').move('a', '/a');
     o = m.execute({b: 1});
     o.should.eql({a: 1});
@@ -526,7 +561,7 @@ describe("Mapper", function() {
     o.should.eql({a: []});
   });
 
-  it("should throw when submap doesn't get a new instance of Mapper", function(){
+  it('should throw when submap doesn\'t get a new instance of Mapper', function(){
     o = m.submap('a', 'b').execute();
     (o instanceof Error).should.eql(true);
   });
@@ -535,6 +570,63 @@ describe("Mapper", function() {
     m.move('a.0.b', 'c', {multiple: true});
     o = m.execute({c: 1});
     o.should.eql({a: [{b: [1]}]});
+  });
+
+  it('should handle an array of input values', function() {
+    m.move('c', ['a','/b'], function(v){return v[1];});
+    o = m.execute({a: 1}, {b: 2});
+    o.should.eql({c: 2});
+  });
+
+  it('should handle an object of input values', function() {
+    m.move('c', {A:'a', B:'/b'}, function(v){return v.B;});
+    o = m.execute({a: 1}, {b: 2});
+    o.should.eql({c: 2});
+  });
+
+  it('should submap from context taking singleton to array', function() {
+    m.submap('d', '/b', {multiple:true}, new Mapper()
+      .move('e','c')
+    );
+    o = m.execute({a: 1}, {b: {c:2}});
+    o.should.eql({d:[{e:2}]});
+  });
+
+  it('should move to array three times', function() {
+    m.move('a', 'b', {multiple:true}).move('a', 'c', {multiple:true}).move('a', 'd', {multiple:true});
+    o = m.execute({b: [1], c: 2, d:3});
+    o.should.eql({a: [1,2,3]});
+  });
+
+  it('should get safely from non-object', function() {
+    m.move('a', 'b.c.d');
+    o = m.execute(1);
+    o.should.eql({});
+  });
+
+  it('should assign multiple times', function() {
+    m.assign('a', 1, {multiple:true}).assign('a', 2, {multiple:true});
+    o = m.execute({});
+    o.should.eql({a: [1,2]});
+  });
+
+  it('should submap from undefined source', function() {
+    m.submap('a', 'b.c', {}, new Mapper());
+    o = m.execute({});
+    o.should.eql({});
+  });
+
+  it('should safely get from null leaf parent', function() {
+    m.move('a', 'b.c');
+    o = m.execute({b:null});
+    o.should.eql({});
+  });
+
+  it('should move default to context', function() {
+    m.move('/a', 'b', {default:1});
+    var context = {};
+    o = m.execute({}, context);
+    context.should.eql({a:1});
   });
 
 });
