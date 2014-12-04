@@ -1,10 +1,10 @@
 {
   "name": "js-object-mapper",
-  "description": "Mapper lib for transforming JavaScript Objects",
+  "description": "Mapper library for transforming JavaScript Objects",
   "version": "1.0.0",
   "author": {
-    "name": "ThomasCookOnline",
-    "email": "technology@thomascookonline.com"
+    "name": "XXX",
+    "email": "XXX@gmail.com"
   },
   "contributors": [
     {
@@ -27,15 +27,12 @@
     "check": "istanbul cover node_modules/mocha/bin/_mocha --report none --dir ./.coverage -- test/ --reporter spec && istanbul check-coverage --statements 90 --functions 90 --lines 90 --branches 90"
   },
   "main": "./src/mapper",
-  "publishConfig": {
-    "registry": "http://npm.eceit.net/"
-  },
   "repository": {
     "type": "git",
-    "url": "http://github.com/ThomasCookOnline/js-object-mapper.git"
+    "url": "http://github.com/XXX/js-object-mapper.git"
   },
   "bugs": {
-    "url": "https://github.com/ThomasCookOnline/js-object-mapper/issues"
+    "url": "https://github.com/XXX/js-object-mapper/issues"
   },
   "dependencies": {
     "JSONPath": "~0.10.0",
@@ -45,26 +42,5 @@
     "istanbul": "^0.3.2",
     "mocha": "~2.0",
     "should": "^4.3.0"
-  },
-  "readmeFilename": "README.md",
-  "homepage": "https://github.com/ThomasCookOnline/js-object-mapper",
-  "_id": "tc-js-object-mapper@1.0.0-0002-cbcf2ca0",
-  "dist": {
-    "shasum": "9c41a23e5a56981ffe09ba4090bd2f8c47d9d89e",
-    "tarball": "http://npm.eceit.net/tc-js-object-mapper/-/tc-js-object-mapper-1.0.0-0002-cbcf2ca0.tgz"
-  },
-  "_from": "tc-js-object-mapper@*",
-  "_npmVersion": "1.4.3",
-  "_npmUser": {
-    "name": "jenkins",
-    "email": "jenkins@thomascookonline.com"
-  },
-  "maintainers": [
-    {
-      "name": "jenkins",
-      "email": "jenkins@thomascookonline.com"
-    }
-  ],
-  "_shasum": "9c41a23e5a56981ffe09ba4090bd2f8c47d9d89e",
-  "_resolved": "http://npm.eceit.net/tc-js-object-mapper/-/tc-js-object-mapper-1.0.0-0002-cbcf2ca0.tgz"
+  }
 }

@@ -1,105 +1,146 @@
-## js-object-mapper
+# js-object-mapper
+
+Use this library to declare move, assign and submap instructions which, when executed, transform an input javascript object into an output javascript object.
+	
+Optional parameters and transform functions make these instructions flexible enough to handle most data mapping requirements.
 
 
-Use this library to construct a Mapper object for transforming a javascript object into a different format with nice fluent api syntax.
-
-Installation
-```
-npm i js-object-mapper
-```
-
-## Example
-as in examples.js:
-``` js
-var Mapper = require('js-object-mapper');
-var repos = require('./source.json');   //our source object is array of repos for a github user
-
-var names = new Mapper().submap('repos', '', new Mapper().move('name', 'name')).execute(repos);
-//returns array with object containing just one property
-console.log(names);   //{ repos:
-                      //  [ { name: 'ADE' },
-                      //          ...
-                      //    { name: 'o.deepObserve' }
-                      //  ]
-                      // }
-```
-
-``` js
-
-```
-
- *assign* is used to set an output field to a fixed value
-
-## Development
+## Install
 
 ``` js
 npm install js-object-mapper
 ```
 
-## Testing
+## Run the Sample
+
+``` js
+cd js-object-mapper
+node docs/sample.js
+```
+You should see:
+
+```js
+mapper:
+new Mapper()
+  .move('Title', 'subject') // move value from property 'subject' to property 'Title'
+  .assign('Version', 1) // assign 1 to property 'Version'
+  .submap('Names', 'list', {}, new Mapper() // map property 'list' to property  ''Names' using submap
+    .move('LastName','surname', {}, function(v){return v.toUpperCase();}) // transform using function
+  )
+;
+
+input:  { subject: 'Duty Roster',
+  list: [ { surname: 'Smith' }, { surname: 'Jones' } ] }
+
+output:  { Title: 'Duty Roster',
+  Version: 1,
+  Names: [ { LastName: 'SMITH' }, { LastName: 'JONES' } ] }
+```
+
+## Test
 
 ``` js
 npm test
+
+npm run cov // writes code coverage to .coverage
+
 ```
 
-## Require it
+## Use
+
+### Definition
+
+Construct a named mapper using the Mapper constructor and configure with a cascade of move, assign and submap instructions.
 
 ``` js
-var Mapper = require('mapper');    
-var mapping = new Mapper()
-    .move(..);
-//The mapper can then be executed like this
-var mapResults = mapping.execute({a: 1});
-```
-An instance of Mapper may be configured by calling a cascade of move, assign and submap methods(described below).
-
-all methods take up to four parameters:
- 
-   1. to - string - dot separated name of target field (prefixed with / to indicate context rather than input or output)
-   2. from - string - name of source field OR array of strings - names of input fields OR javascript literal - value
-   3. options - an object with properties e.g. condition, filter, default etc. (described for each method). optional.
-
-   4. transform - javascript function (move and assign methods)
-   
-      OR
-    Mapper instance for submap method, passed the source field value or array of values, current index of mapped array, and the context object during execution
-
-
-When the instance is executed the transformations are carried out in the order in which they are defined.
-
-``` js
-var output searchMapper.execute(input, context)
+var Mapper = require('mapper');
+var mapper = new Mapper('myMapper')
+    .move(..)
+    .assign(..)
+    .submap(..)
+;
 ```
 
-The context may be used both to pass external variables into and out of the mapper (e.g input parameters).It may also be used to pass variables around within a mapper. (e.g a currency code may be defined at the highest level in the input
+### Execution
+```js
+var context = {config:config, data:data}; // for example
+var output = mapper.execute(input, context);
+```
+When mapper is executed instructions are carried out in the order in which they are defined.
+
+Execution context may be used to pass external variables into and out of the mapper (e.g configuration parameters or reference data). It may also be used to store intermediate results during mapper execution. (e.g a currency code may be defined at the highest level in the input
 but embedded within several sub-maps in the output. We can move it from source into the context in the top level map,
 and move it from the context to the output in an embedded sub-map.)
 
-Context is indicated by a leading / in the field label of a move command. As following diagram illustrates:
+Context is indicated by a leading / in the field label of a move instruction, as the following diagram illustrates:
 
 ![context-source-output](docs/js_object_mapper.png)
 
-## Operations and possible options
+## Instruction Reference
 
-1) **move**
+Instructions take up to four parameters:
 
-A *move* takes to value of an input field and sets an output field to this value.
+   1. **to** specifies the property in the output object for the instruction to update. 
+     * Can be a property name e.g.`'lastName'`
+     * or a dot-separated list of nested property names e.g.`'name.last'` 
+     * A `'/'` prefix is used to indicate that the target is a property of the execution context rather than the output. 
+     * Mandatory. 
+   2. **from** specifies the properties in the input object used by the instruction. 
+     * Can be property name  e.g.`'lastName'`
+     * or a dot-separated list of nested property names e.g.`'name.last'`.
+     * `' '` indicates the entire input object. 
+     * Multiple inputs may be specified in an array e.g.`['last','first']`
+     * or an object  e.g.`{last:'last', first:'first'}`
+     * A `'/'` prefix is used to indicate that the source is a property of the execution context rather than the input object. 
+     * Optional. If not specified then it is assumed to be the same as 'to'. 
+   3. **options** - an object with properties (e.g. condition, filter, default) which modify the instruction's behaviour. 
+      * Varies by instruction (see below)
+      * Optional.
+   4. **transform** - function or mapper instance used to transform  ''from' value to 'to' value'.
+     * Varies by function (see below)
+     * Optional.
 
-Options:
 
-`default`: javascript literal used as input value if the source field is not present
-`condition`: javascript function of full source object which must return true for the move to be executed
-`multiple`: true indicated that the target field is an array and that source value should be pushed onto array.
+#### Move
 
-2) **assign**
+sets target property from values of source properties.
+	
+*options*
 
-Options:
+* condition
+	* `function(v,i,c){return boolean}` 
+    * v is input value, i is index of iterated submap, c is execution context 
+    * returns true or false to indicate whether on not the move takes place
+* multiple 
+    * false (default) - set target value
+    * true - push value to target array
+* default - set target to this value if otherwise unset
 
-`condition`: javascript function of full source object which must return true for the move to be executed
+*transform*
+ 
+* `function(v,i,c){return output;}`
+* v is value of source property (or array or object of values)
+* i is index of enclosing iterated submap (or undefined if not iterated)
+* c is execution context
+* target property set to output (unless transform returns undefined)
+	
 
-3) **submap**
 
-A *submap* is an instance of Mapper which is applied to a field of the source object to generate a field of the target object.
+#### Assign
+	
+sets target property from static value.
+
+*options*
+
+* condition
+	* `function(v,i,c){return boolean}` 
+    * v is input value, i is index of iterated submap, c is execution context 
+    * returns true or false to indicate whether on not the move takes place
+
+#### Submap
+
+A *submap* is an instance of Mapper which is applied to the value of the source object property to generate a value to push or set to target object property.
+
 If the source object is an array then, by default, sub-map will be applied to each element of the array,  generating an output array.
 
 Options:
@@ -108,6 +149,15 @@ Options:
 `condition`: javascript function of full source object which must return true for the sub-map to be executed
 `multiple`: false (maps to same output object)          true  (maps to array)
 `default`: javascript literal used as target value if the source field is not present
+
+
+## Mapping Tips
+
+
+## Generate Unit Tests
+
+## Generate Map Tests
+
 
 
 

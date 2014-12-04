@@ -1,6 +1,6 @@
 var util = require('util');
 var jsonPath = require('JSONPath');
-var logger = require('../tools/logger');
+var logger = require('../src/logger');
 
 /**
  * @param {String} name
@@ -174,7 +174,7 @@ Mapper.prototype = {
       out = e;
     }
     if (process.env.MAPPER_TESTS_GEN === 'true') {
-      var generator = require('../tools/testGenerator');
+      var generator = require('../src/testGenerator');
 
       generator(input, context, out, this.generatorOpts);
     }
