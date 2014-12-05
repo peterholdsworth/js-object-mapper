@@ -48,7 +48,7 @@ npm run cov // writes code coverage to .coverage
 
 ## Use
 
-### Definition
+### Define
 
 Construct a named mapper using the Mapper constructor and configure with a cascade of move, assign and submap instructions.
 
@@ -60,8 +60,10 @@ var mapper = new Mapper('myMapper')
     .submap(..)
 ;
 ```
+Detailed description of the instructions can be found in the Instruction  reference below.
 
-### Execution
+
+### Execute
 ```js
 var context = {config:config, data:data}; // for example
 var output = mapper.execute(input, context);
@@ -74,7 +76,7 @@ and move it from the context to the output in an embedded sub-map.)
 
 Context is indicated by a leading / in the field label of a move instruction, as the following diagram illustrates:
 
-![context-source-output](docs/js_object_mapper.png)
+![](docs/js_object_mapper.png)
 
 ## Instruction Reference
 
@@ -101,7 +103,7 @@ Instructions take up to four parameters:
      * Optional.
 
 
-#### Move
+### Move
 
 sets target property from values of source properties.
 	
@@ -109,7 +111,7 @@ sets target property from values of source properties.
 
 * condition
 	* `function(v,i,c){return boolean}` 
-    * v is input value, i is index of iterated submap, c is execution context 
+    * v is input value, i is index of containing iterated submap, c is execution context 
     * returns true or false to indicate whether on not the move takes place
 * multiple 
     * false (default) - set target value
@@ -126,35 +128,129 @@ sets target property from values of source properties.
 	
 
 
-#### Assign
+### Assign
 	
-sets target property from static value.
+Sets target property from static value.
 
 *options*
 
 * condition
-	* `function(v,i,c){return boolean}` 
-    * v is input value, i is index of iterated submap, c is execution context 
+    * `function(v,i,c){return boolean}` 
+    * v is input value, i is index of containing iterated submap, c is execution context 
     * returns true or false to indicate whether on not the move takes place
 
-#### Submap
+
+*transform*
+ 
+* `function(v,i,c){return output;}`
+* v is value of source property (or array or object of values)
+* i is index of enclosing iterated submap (or undefined if not iterated)
+* c is execution context
+* target property set to output (unless transform returns undefined)
+
+### Submap
 
 A *submap* is an instance of Mapper which is applied to the value of the source object property to generate a value to push or set to target object property.
 
 If the source object is an array then, by default, sub-map will be applied to each element of the array,  generating an output array.
 
-Options:
+If the source object is not an array then, by default, sub-map generates an output object.
 
-`filter`: function of array element and context returning boolean. Array element will only be pushed onto target field if true
-`condition`: javascript function of full source object which must return true for the sub-map to be executed
-`multiple`: false (maps to same output object)          true  (maps to array)
-`default`: javascript literal used as target value if the source field is not present
+*options*
+
+* filter
+    * `function(v,i,c){return boolean}` 
+    * v is value of current element, i is index of current element, c is execution context 
+    * returns true to apply  submit to this element, false to skip.
+* condition
+    * `function(v,i,c){return boolean}` 
+    * v is full input value, i is index of containing iterated submap, c is execution context 
+    * returns true or false to indicate whether on not the submap is executed
+* multiple 
+    * false (default) - set target value
+    * true - push value to target array
+* default - set target to this value if otherwise unset
+
+*transform*
+ 
+* `new Mapper()`
 
 
 ## Mapping Tips
 
+### Mapper.get
+To safely get nested property values from the input or context use the Mapper.get function. Takes a dot separated string and returns data or undefined.
 
-## Generate Unit Tests
+### Using the execution context
+* Complicated mappings can always be implemented in raw javascript, however it is often more readable/maintainable to split the mapping into a number of intermediate stages, storing results in the execution context
+* For example some output formats use variable property names (dependant on data).
+To handle this with a mapper you can firstly map to an equivalent form with static property names in the context, then use a javascript function (in a move instruction) to convert to the final form.
+
+### Merging
+* It is a common requirement to take multiple arrays from the source and merge them together in some way. Sometimes the arrays match one for one and can be merged element by element, in other cases data from one array is looked up to enhance the elements of another. Arrays with a similar structure can also be merged by concatenation.
+* No specific instructions are included in js-object-mapper for merging arrays, but most requirements can be met by iterating over a single array with a submap, using the index parameter passed to contained transform functions to fetch data from elsewhere. Concatenation will occur automatically if two different arrays are submapped to the same target. 
+
+### Common Pitfalls
+* `move` copies values by reference.This does not usually cause a problem, but beware of making updates to properties in the execution context which are referenced by more than one target.  
+* Be careful when using an array in the execution context; this is the main source of hard-to-find mapping bugs. Arrays are not reset automatically so be sure to reset as necessary during submap iterations.  Use `.assign(‘/array’, null)` ( **not** `.assign(‘/array’, [])`)
+
+## Generate Unit Test Skeletons
+
+For good unit test coverage, transform, condition and filter functions should be referenced and tested individually. This can be done with `to` and `paramTo` properties of the map as in the following snippet:
+
+```javascript
+var mapper = new Mapper()
+	.submap('A', 'a', {}, new Mapper()
+		.move(	'B, 
+				'b', 
+				{condition: function(v,i,c){ return v > 0;}}, 
+				function(v,i,c){return Math.sqrt(v);}		) 			)
+;
+
+var transform = mapper.to.A.to.B;
+var condition = mapper.to.A.paramTo.B.condition;
+```
+If a mapper instance is exported from a node module ( using `module.exports = new Mapper()....`) the tools/unitTestGenerator can be used to generate a mocha test skeleton for unit testing a map.
+
+```javascript
+node tools/unitTestGenerator.js sampleMap.js
+```
+will write a sample unit map test to stdout, similar to the following:
+
+```javascript
+/* global describe, it, before, after */
+/* jslint node: true */
+'use strict';
+var should = require('should');
+
+var unitTestSampleMap = require('./sampleMap.js');
+
+var context = {}; // TODO
+
+describe('sampleMap', function(){
+
+  describe('a', function(){
+
+    it('should .....', function(){  // TODO
+      var input = {}; // TODO
+      var output = {}; // TODO
+      unitTestSampleMap.to.a(input, 0, context).should.eql(output);
+    });
+
+  });
+
+  describe('b', function(){
+
+    it('should .....', function(){  // TODO
+      var input = {}; // TODO
+      var output = {}; // TODO
+      unitTestSampleMap.to.b(input, 0, context).should.eql(output);
+    });
+
+  });
+
+});
+```
 
 ## Generate Map Tests
 
