@@ -1,6 +1,6 @@
 var util = require('util');
 var jsonPath = require('JSONPath');
-var logger = require('../tools/logger');
+var debug = require('debug')('js-object-mapper');
 
 /**
  * @param {String} name
@@ -24,7 +24,7 @@ var Mapper = function(name){
 
     var mapperFile = stack.split('\n')[2].match(/\(.*\)/g)[0];
     mapperFile = mapperFile.substr(1, mapperFile.indexOf('.js') + 2);
-    //console.log("mapper file", mapperFile);
+    debug("mapper file", mapperFile);
     this.generatorOpts.mapperFile = mapperFile; //absolute path to the mapperFile
   //}
 };
@@ -196,7 +196,7 @@ Mapper.prototype = {
     var t;
     for ( i=0; i<this.ops.length; i++){
       t = this.ops[i];
-      logger.debug(input, output, t.from, t.to, t.params, t.transform);
+      debug(input, output, t.from, t.to, t.params, t.transform);
 
       target.push(t.to);
       t.op.call(this, input, output, t.from, t.to, t.params, t.transform, context, target, index);
@@ -350,9 +350,9 @@ var submap = function submap(input, output, from, to, params, transform, context
 
 var log = function log(input, output, from, to, params, transform, context, target, index) {
   var n = this.name || this.generatorOpts.mapperFile;
-  console.log('==============start mapping log: ' + n + ' ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
-  console.log(util.inspect(get((from.root === 'context') ? context : output, from.path), {depth: null}));
-  console.log('================end mapping log: ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
+  debug('==============start mapping log: ' + n + ' ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
+  debug(util.inspect(get((from.root === 'context') ? context : output, from.path), {depth: null}));
+  debug('================end mapping log: ' + ((from.root === 'context') ? '/' : '') + from.path.join('.') + '===============');
 };
 
 module.exports = Mapper;
