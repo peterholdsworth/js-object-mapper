@@ -3,7 +3,7 @@
 'use strict';
 var should = require('should');
 
-var unitTestSampleMap = require('../test/sample-maps/unitTestSampleMap.js');
+var unitTestSampleMap = require('./test/sample-maps/unitTestSampleMap.js');
 
 var context = {}; // TODO
 

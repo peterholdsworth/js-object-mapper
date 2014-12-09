@@ -10,7 +10,7 @@ var path = require('path');
 describe('testGenerator', function() {
 
   before(function () {
-    process.env.MAPPER_TESTS_GEN = 'true';
+    process.env.MAPPER_TEST_GEN = 'true';
   });
 
   describe('testGenerator from Mapper', function() {
@@ -70,7 +70,7 @@ describe('testGenerator', function() {
   });
 
   after(function () {
-    delete process.env.MAPPER_TESTS_GEN;
+    delete process.env.MAPPER_TEST_GEN;
   });
 
 });

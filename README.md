@@ -20,19 +20,24 @@ node docs/sample.js
 You should see:
 
 ```js
-mapper:
-new Mapper()
+================== mapper ===================
+var Mapper = require('../src/mapper');
+
+var mapper = new Mapper('sampleMap')
   .move('Title', 'subject') // move value from property 'subject' to property 'Title'
   .assign('Version', 1) // assign 1 to property 'Version'
-  .submap('Names', 'list', {}, new Mapper() // map property 'list' to property  ''Names' using submap
+  .submap('Names', 'list', {}, new Mapper() // map property 'list' to property 'Names' using submap
     .move('LastName','surname', {}, function(v){return v.toUpperCase();}) // transform using function
   )
 ;
 
-input:  { subject: 'Duty Roster',
-  list: [ { surname: 'Smith' }, { surname: 'Jones' } ] }
+module.exports = mapper;
 
-output:  { Title: 'Duty Roster',
+================== input ===================
+{ subject: 'Duty Roster',
+  list: [ { surname: 'Smith' }, { surname: 'Jones' } ] }
+================== output ===================
+{ Title: 'Duty Roster',
   Version: 1,
   Names: [ { LastName: 'SMITH' }, { LastName: 'JONES' } ] }
 ```
@@ -89,7 +94,8 @@ Instructions take up to four parameters:
      * Mandatory. 
    2. **from** specifies the properties in the input object used by the instruction. 
      * Can be property name  e.g.`'lastName'`
-     * or a dot-separated list of nested property names e.g.`'name.last'`.
+     * or a dot-separated list of nested property names e.g.`'name.last'`
+     * or a [JSONPath](https://www.npmjs.org/package/JSONPath) expression e.g.`'$..last'`
      * `' '` indicates the entire input object. 
      * Multiple inputs may be specified in an array e.g.`['last','first']`
      * or an object  e.g.`{last:'last', first:'first'}`
@@ -210,12 +216,12 @@ var mapper = new Mapper()
 var transform = mapper.to.A.to.B;
 var condition = mapper.to.A.paramTo.B.condition;
 ```
-If a mapper instance is exported from a node module ( using `module.exports = new Mapper()....`) the tools/unitTestGenerator can be used to generate a mocha test skeleton for unit testing a map.
+If a mapper instance is exported from a node module ( using `module.exports = new Mapper()....`) the tools/unitTestGenerator can be used to generate a mocha test skeleton for unit testing the map. For example:
 
 ```javascript
-node tools/unitTestGenerator.js sampleMap.js
+node tools/unitTestGenerator.js ./docs/sampleMap.js
 ```
-will write a sample unit map test to stdout, similar to the following:
+will write a sample unit map test skeleton for sampleMap to stdout:
 
 ```javascript
 /* global describe, it, before, after */
@@ -223,37 +229,83 @@ will write a sample unit map test to stdout, similar to the following:
 'use strict';
 var should = require('should');
 
-var unitTestSampleMap = require('./sampleMap.js');
+var sampleMap = require('./docs/sampleMap.js');
 
 var context = {}; // TODO
 
 describe('sampleMap', function(){
 
-  describe('a', function(){
+  describe('Title', function(){
 
     it('should .....', function(){  // TODO
       var input = {}; // TODO
       var output = {}; // TODO
-      unitTestSampleMap.to.a(input, 0, context).should.eql(output);
+      sampleMap.to.Title(input, 0, context).should.eql(output);
     });
 
   });
 
-  describe('b', function(){
+  describe('Version', function(){
 
     it('should .....', function(){  // TODO
       var input = {}; // TODO
       var output = {}; // TODO
-      unitTestSampleMap.to.b(input, 0, context).should.eql(output);
+      sampleMap.to.Version(input, 0, context).should.eql(output);
     });
 
   });
 
+  describe('Names', function(){
+
+    describe('LastName', function(){
+
+      it('should .....', function(){  // TODO
+        var input = {}; // TODO
+        var output = {}; // TODO
+        sampleMap.to.Names.to.LastName(input, 0, context).should.eql(output);
+      });
+
+    });
+
+  });
 });
 ```
 
 ## Generate Map Tests
 
+Unit tests are good for test coverage of embedded javascript functions but don't actually test map output for given input.  To create a map test execute the map with the environment variable `MAPPER_TEST_GEN` set to `true`.
+
+```js
+MAPPER_TEST_GEN=true node docs/sample.js
+```
+executes the sampleMap mapper, causing  sampleMap.spec.js  to be written to the test directory:
+
+``` js
+/* global describe, it, before, after */
+/* jslint node: true */
+'use strict';
+
+var should = require('should');
+var sampleMap = require('../docs/sampleMap.js');
+
+var context = {} ;
+
+
+describe("Test for mapper sampleMap", function () {
+
+  var input = { subject: 'Duty Roster',
+    list: [ { surname: 'Smith' }, { surname: 'Jones' } ] };
+
+  it("Test for mapper sampleMap", function () {
+    var output = sampleMap.execute(input, Object.create(context));
+
+    output.should.eql({ Title: 'Duty Roster',
+      Version: 1,
+      Names: [ { LastName: 'SMITH' }, { LastName: 'JONES' } ] });
+  });
+
+});
+```
 
 
 

@@ -19,7 +19,7 @@ var Mapper = function(name){
   this.paramTo = {}; // maps 'to' string to parameters so they can be easily accessed for unit testing
   this.generatorOpts = {name: this.name};
 
-  //if (process.env.MAPPER_TESTS_GEN === 'true') {
+  //if (process.env.MAPPER_TEST_GEN === 'true') {
     var stack = new Error().stack;
 
     var mapperFile = stack.split('\n')[2].match(/\(.*\)/g)[0];
@@ -173,7 +173,7 @@ Mapper.prototype = {
       });
       out = e;
     }
-    if (process.env.MAPPER_TESTS_GEN === 'true') {
+    if (process.env.MAPPER_TEST_GEN === 'true') {
       var generator = require('../src/testGenerator');
 
       generator(input, context, out, this.generatorOpts);
