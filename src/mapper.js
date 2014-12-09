@@ -174,7 +174,7 @@ Mapper.prototype = {
       out = e;
     }
     if (process.env.MAPPER_TEST_GEN === 'true') {
-      var generator = require('../tools/testGenerator');
+      var generator = require('../src/testGenerator');
 
       generator(input, context, out, this.generatorOpts);
     }
