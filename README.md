@@ -29,6 +29,7 @@ var mapper = new Mapper('sampleMap')
   .submap('Names', 'list', {}, new Mapper() // map property 'list' to property 'Names' using submap
     .move('LastName','surname', {}, function(v){return v.toUpperCase();}) // transform using function
   )
+  .log('Title')
 ;
 
 module.exports = mapper;
@@ -181,6 +182,21 @@ If the source object is not an array then, by default, sub-map generates an outp
  
 * `new Mapper()`
 
+### Log
+
+The log instruction takes the *to* parameter only, and displays debug information about the value of the output or context property specified. For example:
+
+```js
+DEBUG=js-object-mapper node sample.js
+```
+Output will include:
+
+```js
+  js-object-mapper ==============start mapping log: sampleMap Title=============== +0ms
+  js-object-mapper 'Duty Roster' +0ms
+  js-object-mapper ================end mapping log: Title=============== +0ms
+```
+This can be particularly useful for examining intermediate results.
 
 ## Mapping Tips
 
@@ -273,7 +289,7 @@ describe('sampleMap', function(){
 
 ## Generate Map Tests
 
-Unit tests are good for test coverage of embedded javascript functions but don't actually test map output for given input.  To create a map test execute the map with the environment variable `MAPPER_TEST_GEN` set to `true`.
+Unit tests are good for test coverage of embedded javascript functions but don't test map output for given input.  To create a map test execute the map with the environment variable `MAPPER_TEST_GEN` set to `true`.
 
 ```js
 MAPPER_TEST_GEN=true node docs/sample.js
@@ -307,7 +323,11 @@ describe("Test for mapper sampleMap", function () {
 });
 ```
 
+To run this test:
 
+```js
+npm test
+```
 
 
 

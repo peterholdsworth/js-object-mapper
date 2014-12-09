@@ -6,6 +6,7 @@ var mapper = new Mapper('sampleMap')
   .submap('Names', 'list', {}, new Mapper() // map property 'list' to property 'Names' using submap
     .move('LastName','surname', {}, function(v){return v.toUpperCase();}) // transform using function
   )
+  .log('Title')
 ;
 
 module.exports = mapper;
