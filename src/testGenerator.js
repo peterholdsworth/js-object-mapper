@@ -6,8 +6,7 @@ var util         = require('util');
 var fs           = require('fs');
 var _            = require('lodash');
 var path = require('path');
-var logger       = require('./logger');
-
+var debug = require('debug')('js-object-mapper:test-generator');
 /**
  * @param {String} str
  * @param {Number} tabs
@@ -36,7 +35,7 @@ var indent = function (str, tabs, noNewLine) {
  * @param {String} opts.toPath to indicate where test should be generated
  **/
 module.exports = function(input, context, output, opts) {
-  logger.log('generation of test for a Mapper file: ', opts.mapperFile);
+  debug('generation of test for a Mapper file: ', opts.mapperFile);
 
   var pathPrefix = opts.toPath || path.join('./', '/test/');
 
@@ -65,7 +64,7 @@ module.exports = function(input, context, output, opts) {
     fs.appendFileSync(fileName, testHeaders);
   }
 
-  logger.debug('Generating test for map ' + name + ' on file ' + fileName);
+  debug('Generating test for map ' + name + ' on file ' + fileName);
   testStr += indent('describe("Test for mapper ' + opts.name + '", function () {', 0) + '\n';
 
   if (typeof opts.before === 'function') {
@@ -96,7 +95,7 @@ module.exports = function(input, context, output, opts) {
   testStr += indent('});', 0) + '\n';
 
   fs.appendFileSync(fileName, testStr);
-  logger.debug('Added test for map ' + name);
+  debug('Added test for map ' + name);
 
 };
 
