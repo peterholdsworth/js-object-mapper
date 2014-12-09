@@ -2,6 +2,7 @@
 // Writes skeleton unit test file to console
 // node unitTestGenerator.js <mappath>
 
+var path = require('path');
 var indent = '  '; // two spaces
 var mapper;
 var name;
@@ -113,7 +114,7 @@ var formatMapper = function(mapper){
 };
 
 try {
-  mapper = require(process.argv[2]);
+  mapper = require(path.resolve(process.argv[2]));
   name = mapper.name;
   print('/* global describe, it, before, after */');
   print('/* jslint node: true */');

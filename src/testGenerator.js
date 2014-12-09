@@ -88,6 +88,7 @@ module.exports = function(input, context, output, opts) {
 
   if (typeof opts.after === 'function') {
     testStr += indent('after(', 1, true);
+    testStr += opts.after.toString();  //user defined function or empty function
     testStr += indent(');', 1) + '\n';
   }
 

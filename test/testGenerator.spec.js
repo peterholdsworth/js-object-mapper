@@ -1,16 +1,16 @@
 /* jslint node:true, sub:true */
-/* global describe, it, before, after,afterEach */
+/* global describe, it, before, after */
 
 'use strict';
-var should = require('should'),
-    fs    = require('fs');
-var testGenerator = require('../tools/testGenerator');
+var should = require('should');
+var fs    = require('fs');
+var testGenerator = require('../src/testGenerator');
 var path = require('path');
 
 describe('testGenerator', function() {
 
   before(function () {
-    process.env.MAPPER_TESTS_GEN = 'true';
+    process.env.MAPPER_TEST_GEN = 'true';
   });
 
   describe('testGenerator from Mapper', function() {
@@ -18,6 +18,7 @@ describe('testGenerator', function() {
 
     it('should generate test for each of the mappers run', function() {
       require(p1).execute({'b': 1});
+      require('./sample-maps/mapper-before-after').execute({'b': 1}); // for test coverage
       require('./sample-maps/mapper-testgen2').execute([1,2]);
 
       var generatedTest1 = fs.readFileSync('./test/mapper-testgen1.spec.js');
@@ -45,6 +46,7 @@ describe('testGenerator', function() {
     after(function () {
       fs.unlinkSync('./test/mapper-testgen1.spec.js');
       fs.unlinkSync('./test/mapper-testgen2.spec.js');
+      fs.unlinkSync('./test/mapper-before-after.spec.js');
       fs.unlinkSync('./test/mapper-error-throwing.spec.js');
     });
 
@@ -68,7 +70,7 @@ describe('testGenerator', function() {
   });
 
   after(function () {
-    delete process.env.MAPPER_TESTS_GEN;
+    delete process.env.MAPPER_TEST_GEN;
   });
 
 });
