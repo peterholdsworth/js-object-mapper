@@ -2,27 +2,6 @@
   "name": "js-object-mapper",
   "description": "Mapper library for transforming JavaScript Objects",
   "version": "1.0.0",
-  "author": {
-    "name": "XXX",
-    "email": "XXX@gmail.com"
-  },
-  "contributors": [
-    {
-      "name": "Peter Holdsworth",
-      "email": "peter.j.holdsworth@gmail.com"
-    },    {
-      "name": "Lucas Acosta",
-      "email": "lucasmacosta@gmail.com"
-    },
-    {
-      "name": "Jiří Špác",
-      "email": "capajj@gmail.com"
-    },
-    {
-      "name": "juanluandrades",
-      "email": "juanluandrades@gmail.com"
-    }
-  ],
   "engine": "node >= 0.10.12",
   "scripts": {
     "test": "mocha",
@@ -32,10 +11,10 @@
   "main": "./src/mapper",
   "repository": {
     "type": "git",
-    "url": "http://github.com/XXX/js-object-mapper.git"
+    "url": "http://github.com/starcount/js-object-mapper.git"
   },
   "bugs": {
-    "url": "https://github.com/XXX/js-object-mapper/issues"
+    "url": "https://github.com/starcount/js-object-mapper/issues"
   },
   "dependencies": {
     "JSONPath": "~0.10.0",
