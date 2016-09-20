@@ -223,10 +223,12 @@ For good unit test coverage, transform, condition and filter functions should be
 ```javascript
 var mapper = new Mapper()
 	.submap('A', 'a', {}, new Mapper()
-		.move(	'B, 
+		.move(	'B', 
 				'b', 
 				{condition: function(v,i,c){ return v > 0;}}, 
-				function(v,i,c){return Math.sqrt(v);}		) 			)
+				function(v,i,c){return Math.sqrt(v);}
+		) 		
+	)
 ;
 
 var transform = mapper.to.A.to.B;
